@@ -6,6 +6,10 @@ To start this API, create a `.env` file in the root of this folder with this con
 NODE_ENV="development"
 DATABASE_USERNAME="root"
 DATABASE_PASSWORD=""
+AUTH_JWKS_URI=your auth0 domain/.well-known/jwks.json
+AUTH_AUDIENCE=your unique auth0 id for the webservice
+AUTH_ISSUER=your auth0 domain
+AUTH_USER_INFO=your auth0 domain/userinfo
 ```
 
 Update the username and password with the credentials of your local database.
