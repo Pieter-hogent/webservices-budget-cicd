@@ -133,7 +133,9 @@ module.exports = async function createServer() {
       }
 
       if (ctx.state.jwtOriginalError) {
-        statusCode = 403;
+        statusCode = 401;
+        errorBody.code = 'UNAUTHORIZED';
+        errorBody.message = ctx.state.jwtOriginalError.message;
         errorBody.details.jwtOriginalError = serializeError(ctx.state.jwtOriginalError);
       }
 
