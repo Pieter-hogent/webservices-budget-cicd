@@ -98,6 +98,7 @@ module.exports = async function createServer() {
           code: 'NOT_FOUND',
           message: `Unknown resource: ${ctx.url}`,
         };
+        ctx.status = 404;
       }
     } catch (error) {
       const logger = getLogger();
