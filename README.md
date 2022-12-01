@@ -29,7 +29,7 @@ Run the app in production mode with `yarn start:prod`. We then assume all necess
 
 ## How to test
 
-Create a `.env.test` with the same configuration as above and these extra's:
+Create a `.env.test` with a similar configuration as above (use another database) and these extra's:
 
 ```
 AUTH_TEST_USER_USER_ID=your test user id
