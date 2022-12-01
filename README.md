@@ -27,6 +27,21 @@ Run the app in development mode with `yarn start`.
 
 Run the app in production mode with `yarn start:prod`. We then assume all necessary environment variables are set, no `.env` file is ever read with this command.
 
+## How to test
+
+Create a `.env.test` with the same configuration as above and these extra's:
+
+```
+AUTH_TEST_USER_USER_ID=your test user id
+AUTH_TEST_USER_USERNAME=your test user username
+AUTH_TEST_USER_PASSWORD=your test user password
+AUTH_TOKEN_URL=your auth0 domain/oauth/token
+AUTH_CLIENT_ID=your auth0 application client id
+AUTH_CLIENT_SECRET=your auth0 application client id secret
+```
+
+Run the tests with `yarn test`. To get coverage run `yarn test:coverage`.
+
 ## Common errors
 
 * Modules not found errors, try this and run again:

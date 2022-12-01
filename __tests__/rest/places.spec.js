@@ -31,10 +31,12 @@ const dataToDelete = {
 describe('Places', () => {
   let request;
   let knex;
+  let authHeader;
 
-  withServer(({ knex: k, request: r }) => {
+  withServer(({ knex: k, request: r, authHeader: a }) => {
     knex = k;
     request = r;
+    authHeader = a;
   });
 
   const url = '/api/places';
@@ -52,7 +54,8 @@ describe('Places', () => {
     });
 
     test('it should 200 and return all places', async () => {
-      const response = await request.get(url);
+      const response = await request.get(url)
+        .set('Authorization', authHeader);
 
       expect(response.status).toBe(200);
       // one place from transactions could be present due to Jest running all tests parallel
@@ -75,7 +78,9 @@ describe('Places', () => {
     });
 
     test('it should 200 and return the requested place', async () => {
-      const response = await request.get(`${url}/${data.places[0].id}`);
+      const response = await request.get(`${url}/${data.places[0].id}`)
+        .set('Authorization', authHeader);
+
       expect(response.status).toBe(200);
       expect(response.body).toEqual(data.places[0]);
     });
@@ -93,6 +98,7 @@ describe('Places', () => {
 
     test('it should 201 and return the created place', async () => {
       const response = await request.post(url)
+        .set('Authorization', authHeader)
         .send({
           name: 'New place',
         });
@@ -107,6 +113,7 @@ describe('Places', () => {
 
     test('it should 201 and return the created place with it\'s rating', async () => {
       const response = await request.post(url)
+        .set('Authorization', authHeader)
         .send({
           name: 'Lovely place',
           rating: 5,
@@ -135,6 +142,7 @@ describe('Places', () => {
 
     test('it should 200 and return the updated place', async () => {
       const response = await request.put(`${url}/${data.places[0].id}`)
+        .set('Authorization', authHeader)
         .send({
           name: 'Changed name',
           rating: 1,
@@ -156,7 +164,8 @@ describe('Places', () => {
     });
 
     test('it should 204 and return nothing', async () => {
-      const response = await request.delete(`${url}/${data.places[0].id}`);
+      const response = await request.delete(`${url}/${data.places[0].id}`)
+        .set('Authorization', authHeader);
 
       expect(response.status).toBe(204);
       expect(response.body).toEqual({});

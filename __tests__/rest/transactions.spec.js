@@ -1,3 +1,5 @@
+const config = require('config');
+
 const { withServer } = require('../helpers');
 const { tables } = require('../../src/data');
 
@@ -31,7 +33,8 @@ const data = {
   }],
   users: [{
     id: 1,
-    name: 'Test User',
+    name: config.get('auth.testUser.username'),
+    auth0id: config.get('auth.testUser.userId'),
   }],
 };
 
@@ -48,10 +51,12 @@ const dataToDelete = {
 describe('Transactions', () => {
   let request;
   let knex;
+  let authHeader;
 
-  withServer(({ knex: k, request: r }) => {
+  withServer(({ knex: k, request: r, authHeader: a }) => {
     knex = k;
     request = r;
+    authHeader = a;
   });
 
   const url = '/api/transactions';
@@ -78,7 +83,9 @@ describe('Transactions', () => {
     });
 
     test('it should 200 and return all transactions', async () => {
-      const response = await request.get(url);
+      const response = await request.get(url)
+        .set('Authorization', authHeader);
+
       expect(response.status).toBe(200);
       expect(response.body.count).toBe(3);
     });
@@ -108,14 +115,15 @@ describe('Transactions', () => {
 
     test('it should 200 and return the requested transaction', async () => {
       const transactionId = data.transactions[0].id;
-      const response = await request.get(`${url}/${transactionId}`);
+      const response = await request.get(`${url}/${transactionId}`)
+        .set('Authorization', authHeader);
 
       expect(response.status).toBe(200);
       expect(response.body).toEqual({
         id: transactionId,
         user: {
-          id: 1,
-          name: 'Test User',
+          id: data.users[0].id,
+          name: data.users[0].name,
         },
         place: {
           id: 10,
@@ -152,11 +160,11 @@ describe('Transactions', () => {
 
     test('it should 201 and return the created transaction', async () => {
       const response = await request.post(url)
+        .set('Authorization', authHeader)
         .send({
           amount: 102,
           date: '2021-05-27T13:00:00.000Z',
           placeId: 10,
-          user: 'Test User',
         });
 
       expect(response.status).toBe(201);
@@ -168,7 +176,7 @@ describe('Transactions', () => {
         name: 'Test place',
       });
       expect(response.body.user.id).toBeTruthy();
-      expect(response.body.user.name).toBe('Test User');
+      expect(response.body.user.name).toBe(data.users[0].name);
 
       transactionsToDelete.push(response.body.id);
       usersToDelete.push(response.body.user.id);
@@ -206,11 +214,11 @@ describe('Transactions', () => {
 
     test('it should 200 and return the updated transaction', async () => {
       const response = await request.put(`${url}/4`)
+        .set('Authorization', authHeader)
         .send({
           amount: -125,
           date: '2021-05-27T13:00:00.000Z',
           placeId: 10,
-          user: 'Test User',
         });
 
       expect(response.status).toBe(200);
@@ -221,7 +229,7 @@ describe('Transactions', () => {
         id: 10,
         name: 'Test place',
       });
-      expect(response.body.user.name).toEqual('Test User');
+      expect(response.body.user.name).toEqual(data.users[0].name);
 
       usersToDelete.push(response.body.user.id);
     });
@@ -254,7 +262,9 @@ describe('Transactions', () => {
     });
 
     test('it should 204 and return nothing', async () => {
-      const response = await request.delete(`${url}/4`);
+      const response = await request.delete(`${url}/4`)
+        .set('Authorization', authHeader);
+
       expect(response.status).toBe(204);
       expect(response.body).toEqual({});
     });
